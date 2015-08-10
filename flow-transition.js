@@ -14,9 +14,6 @@ var _ready = false;
  *     "down", {easing: "spring", duration: 325}
  * You can use a txFull screen option "down", which refers to the direction
  * of travel of the template. It can be moving: down, up, left, or right
- *
- *
- * @TODO: set the content template thing with divs and what-not
  */
 
 Template.section.rendered = function() {
