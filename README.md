@@ -6,8 +6,8 @@ A Blaze layout renderer that uses VelocityJS powered transitions. It currently w
 * Rendering layouts to different sections (regions) using Blaze
 * Assign transitions for each section, organized by route name
 * Transitions can be:
-..* Pre-defined full page transitions: sliding up, right, down, or left
-..* Velocity or VelocityUI Pack animations
+.. * Pre-defined full page transitions: sliding up, right, down, or left
+.. * Velocity or VelocityUI Pack animations
 * Custom options can be included to override default transitions
 * Sections will only re-render when necessary or when explicitly requested
 * Not all sections have to be used on every route
@@ -18,6 +18,7 @@ A Blaze layout renderer that uses VelocityJS powered transitions. It currently w
 - Offer default animation on a per section basis
 - Add automatic reverse animation for return routes
 - Integrate better with VelocityUI pack and Velocity registered animations
+- Add a CSS suggestions section to this readme file
 
 ## Getting Started
 
@@ -153,19 +154,18 @@ The last transition example in the [Getting Started](#getting-started) section s
 
 Let's take apart the `txIn` object:
 
-`pre: {translateY: '-100%'},` This is for a $.Velocity.hook() call, which will initially
+`pre: {translateY: '-100%'},` This is for a $.Velocity.hook() call, similar to CSS, but it works on transforms
 
-`animation: {translateY: [0, '-100%']},`
+`animation: {translateY: [0, '-100%']},` This is the animation object
 
 `options: { ..
-  duration: 220,
-  easing: 'spring',
-  queue: false,
-  complete: function() {
-   console.log('You can add a callback function here');
-}
-    }`
-  }
+  duration: 220, ..
+  easing: 'spring', ..
+  queue: false, ..
+  complete: function() { ..
+    console.log('You can add a callback function here'); ..
+  } ..
+}`
 
 ## CSS Suggestions
 CSS info
