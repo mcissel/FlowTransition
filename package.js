@@ -1,18 +1,25 @@
 Package.describe({
   name: 'mcissel:flow-transition',
   version: '0.1.0',
-  // Brief, one-line summary of the package.
-  summary: '',
-  // URL to the Git repository containing the source code for this package.
-  git: '',
+  summary: 'A transition and layout renderer for FlowRouter',
+  git: 'https://github.com/mcissel/FlowTransition',
   documentation: 'README.md'
 });
 
 Package.onUse(function(api) {
-  api.versionsFrom('1.1.0');
-  api.use(['blaze', 'templating', 'underscore']);
+  api.versionsFrom('1.1');
+  api.use('blaze');
+  api.use('templating');
+  api.use('underscore');
+  api.use('velocityjs:velocityjs');
+  api.use('kadira:flow-router');
 
-  api.addFiles('flow-transition.js');
+  api.addFiles([
+    'section.html',
+    'flow-transition.js'
+  ], ['client']);
+
+  api.export("FlowTransition", 'client');
 });
 
 Package.onTest(function(api) {
