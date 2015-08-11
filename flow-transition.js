@@ -34,10 +34,10 @@ function _setUiHooks(parentElement, transitions) {
       uiHooks.insertElement = function(node) {
         var _tx = transitions.txIn;
 
-        // set up the hook to apply properties before insertion
-        if (_tx.hook) {
-          $.Velocity.hook(node, _tx.hook.property, _tx.hook.value);
-        }
+        // set up the hooks to apply properties before insertion
+        _.each(_tx.hook, function(value, property) {
+          $.Velocity.hook(node, property, value);
+        });
 
         // insert the new element
         $(node).prependTo(parentElement);
@@ -66,10 +66,10 @@ function _setUiHooks(parentElement, transitions) {
 
         })(_tx.options.complete);
 
-        // set up the hook to apply properties before insertion
-        if (_tx.hook) {
-          $.Velocity.hook(node, _tx.hook.property, _tx.hook.value);
-        }
+        // set up the hooks to apply properties before insertion
+        _.each(_tx.hook, function(value, property) {
+          $.Velocity.hook(node, property, value);
+        });
 
         // start the animation when the DOM is ready
         Meteor.defer(function() {
@@ -101,12 +101,13 @@ function _attachDeepObject() {
 function _attachFullPageAnimations() {
   var _txName, _options, _property, _value, _valueOpposite;
 
-  // can either be a string name, or an array in the form [name, options]
-  if (typeof this.txFull === 'string') {
-    this.txFull = [this.txFull];
-  }
-  _txName = this.txFull[0];
-  _options = this.txFull[1] || {
+  // can either be a string name, or an object in the form {properties: {}, options: {}}
+  this.txFull = (typeof this.txFull === 'string') ? {properties: this.txFull} : this.txFull;
+//  if (typeof this.txFull === 'string') {
+//    this.txFull = [this.txFull];
+//  }
+  _txName = this.txFull.properties;
+  _options = this.txFull.options || {
     duration: 350,
     easing: 'ease-out',
     queue: false
@@ -125,17 +126,17 @@ function _attachFullPageAnimations() {
 
   // attach the txIn and txOut objects
   this.txOut = {properties: {} };
-  this.txIn = {pre: {}, properties: {}, hook: {
-    property: _property,
-    value: _value
-  }};
+  this.txIn = {pre: {}, properties: {}, hooks: {}};
+
+  this.txIn.hooks[_property] = _value;
   this.txIn.properties[_property] = [0, _value];
+
   this.txOut.properties[_property] = [_valueOpposite, 0];
   this.txOut.options = this.txIn.options = _options;
 }
 
 // FlowTransition.transitionStore holds objects in the form:
-//    [section][newRoute][oldRoute][txDirection][properties, options, hook]
+//    [section][newRoute][oldRoute][txDirection]{ TRANSITION OBJECT }
 FlowTransition.addTransition = function(transition) {
   var _tx = transition;
   var _fts = FlowTransition.transitionStore;
