@@ -17,7 +17,6 @@ var _ready = false;
  */
 
 Template.section.rendered = function() {
-  console.log(this.data.name);
   section = this.data.name;
   FlowTransition._sections[section] = document.getElementById(section);
 };
@@ -28,53 +27,56 @@ function _setUiHooks(parentElement, transitions) {
   }
 
   var uiHooks = {};
-  if (transitions && transitions.txIn) {
-    uiHooks.insertElement = function(node) {
-      var _tx = transitions.txIn;
 
-      // set up the hook to apply properties before insertion
-      if (_tx.pre) {
-        var _property = _.keys(_tx.pre)[0];
-        var _value = _.values(_tx.pre)[0];
-        $.Velocity.hook(node, _property, _value);
-      }
+  if (transitions) {
 
-      // insert the new element
-      $(node).prependTo(parentElement);
+    if (transitions.txIn) {
+      uiHooks.insertElement = function(node) {
+        var _tx = transitions.txIn;
 
-      // start the animation when the DOM is ready
-      Meteor.defer(function() {
-        $(node).velocity(_tx.animation, _tx.options);
-      });
-    };
-  }
+        // set up the hook to apply properties before insertion
+        if (_tx.hook) {
+          $.Velocity.hook(node, _tx.hook.property, _tx.hook.value);
+        }
 
-  if (transitions && transitions.txOut) {
-    uiHooks.removeElement = function(node) {
-      var _tx = transitions.txOut;
-      _tx.options = _tx.options || {};
+        // insert the new element
+        $(node).prependTo(parentElement);
 
-      _tx.options.complete = (function(complete) {
-        return function() {
-          if (complete) {
-            complete.apply(complete, arguments);
-          }
-          $(node).remove();
-        };
-      })(_tx.options.complete);
+        // start the animation when the DOM is ready
+        Meteor.defer(function() {
+          $(node).velocity(_tx);
+        });
+      };
+    }
 
-      // set up the hook to apply properties before insertion
-      if (_tx.pre) {
-        var _property = _.keys(_tx.pre)[0];
-        var _value = _.values(_tx.pre)[0];
-        $.Velocity.hook(node, _property, _value);
-      }
+    if (transitions.txOut) {
+      uiHooks.removeElement = function(node) {
+        var _tx = transitions.txOut;
 
-      // start the animation when the DOM is ready
-      Meteor.defer(function() {
-        $(node).velocity(_tx.animation, _tx.options);
-      });
-    };
+        // callback = node.remove + user defined callback
+        _tx.options = _tx.options || {};
+        _tx.options.complete = (function(complete) {
+
+          return function() {
+            if (complete) {
+              complete.apply(complete, arguments);
+            }
+            $(node).remove();
+          };
+
+        })(_tx.options.complete);
+
+        // set up the hook to apply properties before insertion
+        if (_tx.hook) {
+          $.Velocity.hook(node, _tx.hook.property, _tx.hook.value);
+        }
+
+        // start the animation when the DOM is ready
+        Meteor.defer(function() {
+          $(node).velocity(_tx);
+        });
+      };
+    }
   }
 
   parentElement._uihooks = uiHooks;
@@ -82,11 +84,15 @@ function _setUiHooks(parentElement, transitions) {
 
 function _attachDeepObject() {
   var missingKey = false;
+
   _.reduce(arguments, function(mem, key) {
+
     if (!key) {
       missingKey = true;
     }
+
     return mem = mem[key] = mem[key] || {};
+
   }, this);
 
   return !missingKey;
@@ -112,24 +118,24 @@ function _attachFullPageAnimations() {
     return;
   }
 
-  // get the property and value for the animations
+  // get the property and value for the animation
   _property = (_txName === 'down' || _txName === 'up') ? 'translateY' : 'translateX';
   _value = (_txName === 'down' || _txName === 'right') ? '-100%' : '100%';
   _valueOpposite = (_txName === 'down' || _txName === 'right') ? '100%' : '-100%';
 
-  // create the txIn object as a member of this transition object
-  this.txIn = {pre:{}, animation:{}};
-  this.txIn.pre[_property] = _value;
-  this.txIn.animation[_property] = [0, _value];
-  this.txIn.options = _options;
-
-  this.txOut = {animation:{}};
-  this.txOut.animation[_property] = [_valueOpposite, 0];
-  this.txOut.options = _options;
+  // attach the txIn and txOut objects
+  this.txOut = {properties: {} };
+  this.txIn = {pre: {}, properties: {}, hook: {
+    property: _property,
+    value: _value
+  }};
+  this.txIn.properties[_property] = [0, _value];
+  this.txOut.properties[_property] = [_valueOpposite, 0];
+  this.txOut.options = this.txIn.options = _options;
 }
 
-// Add to the transitionStore, an object in the form:
-//    [section][newRoute][oldRoute][txDirection][animation,options,pre]
+// FlowTransition.transitionStore holds objects in the form:
+//    [section][newRoute][oldRoute][txDirection][properties, options, hook]
 FlowTransition.addTransition = function(transition) {
   var _tx = transition;
   var _fts = FlowTransition.transitionStore;
@@ -144,11 +150,11 @@ FlowTransition.addTransition = function(transition) {
     _attachFullPageAnimations.call(_tx);
   }
   if (_tx.txIn) {
-    var _txIn = (typeof _tx.txIn === 'string') ? {animation: _tx.txIn} : _tx.txIn;
+    var _txIn = (typeof _tx.txIn === 'string') ? {properties: _tx.txIn} : _tx.txIn;
     _fts[_tx.section][_tx.to][_tx.from].txIn = _txIn;
   }
   if (_tx.txOut) {
-    var _txOut = (typeof _tx.txOut === 'string') ? {animation: _tx.txOut} : _tx.txOut;
+    var _txOut = (typeof _tx.txOut === 'string') ? {properties: _tx.txOut} : _tx.txOut;
     _fts[_tx.section][_tx.to][_tx.from].txOut = _txOut;
   }
 };
@@ -158,10 +164,10 @@ FlowTransition.applyTransitions = function(newRoute, oldRoute) {
   var hasTransition = {};
 
   _.each(FlowTransition._sections, function(parentElement, section) {
-    var transitions = null;
-    if (oldRoute && _fts[section] && _fts[section][newRoute] && _fts[section][newRoute][oldRoute]) {
-      transitions = _fts[section][newRoute][oldRoute];
-    }
+
+    // get the transition object or set it to null
+    var transitions = oldRoute && _fts[section] && _fts[section][newRoute] && _fts[section][newRoute][oldRoute] &&
+      _fts[section][newRoute][oldRoute];
     hasTransition[section] = transitions ? true : false;
 
     // when transitions is null, stale _uihooks will be removed from the parentElement

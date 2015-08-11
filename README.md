@@ -17,8 +17,9 @@ A Blaze layout renderer that uses VelocityJS powered transitions. It currently w
 - Allow for multiple parent layouts
 - Offer default animation on a per section basis
 - Add automatic reverse animation for return routes
-- Integrate better with VelocityUI pack and Velocity registered animations
+- Put a delay or stop all animations to fix the multiple animations bug
 - Add a CSS suggestions section to this readme file
+- Make some tests for tinyTest
 
 ## Getting Started
 
@@ -154,9 +155,15 @@ The last transition example in the [Getting Started](#getting-started) section s
 
 Let's take apart the `txIn` object:
 
-`pre: {translateY: '-100%'},` This is for a $.Velocity.hook() call, similar to CSS, but it works on transforms
+The `pre` object is applied to the content using a $.Velocity.hook() call
+```
+.. pre: {translateY: '-100%'},
+```
+This is the animation object
+```
+.. animation: {translateY: [0, '-100%']},
+```
 
-`animation: {translateY: [0, '-100%']},` This is the animation object
 
 `options: { ..
   duration: 220, ..

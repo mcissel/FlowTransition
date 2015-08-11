@@ -1,6 +1,6 @@
 Package.describe({
   name: 'mcissel:flow-transition',
-  version: '0.1.0',
+  version: '1.0.0',
   summary: 'A transition and layout renderer for FlowRouter',
   git: 'https://github.com/mcissel/FlowTransition',
   documentation: 'README.md'
