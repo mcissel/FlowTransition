@@ -44,12 +44,14 @@ FlowRouter.route("/",
   action: function() {
     FlowTransition.flow({body: "welcome"});
   }
+);
 
-FlowRouter.route("/",
+FlowRouter.route("/articles",
   name: "articles", // required
   action: function() {
     FlowTransition.flow({head: "header"}, {body: "articles"});
   }
+);
 ~~~
 
 Now you can set up these transitions by assigning the:

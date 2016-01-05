@@ -11,8 +11,8 @@ Package.onUse(function(api) {
   api.use('blaze');
   api.use('templating');
   api.use('underscore');
-  api.use('velocityjs:velocityjs');
-  api.use('kadira:flow-router');
+  api.use('velocityjs:velocityjs@1.2.1');
+  api.use('kadira:flow-router@2.1.1');
 
   api.addFiles([
     'section.html',
