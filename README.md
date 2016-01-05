@@ -20,8 +20,8 @@ You will need a few templates and a couple routes, before you can add a transiti
 
 ~~~html
 <body>
-  <section name="head"></section>
-  <section name="body"></section>
+  {{> section name="head"}}
+  {{> section name="body"}}
 </body>
 
 <template name="header">
@@ -57,8 +57,8 @@ FlowRouter.route("/articles",
 Now you can set up these transitions by assigning the:
 
 * Section that will be animated (`section`)
-* Name of destination route (`from`)
-* Name of departure route (`to`)
+* Name of departure route (`from`)
+* Name of destination route (`to`)
 * Transition object (`txFull` or `txIn`/`txOut`)
 
 ~~~js
@@ -89,7 +89,7 @@ FlowTransition.addTransition({
 ~~~
 
 ### Re-rendering
-When a section's content doesn't change, it will not re-render, UNLESS you assign a transition to that section for that route. For example, if you change your header template and add the following code:
+When a section's content doesn't change, it will not re-render, UNLESS you assign a transition to that section for that route. For example, if you change your header template to:
 
 ~~~html
 <template name="header">
@@ -98,6 +98,8 @@ When a section's content doesn't change, it will not re-render, UNLESS you assig
 
 <template name="about_us"><h2>Mission Statement and Contact Info</h2></template>
 ~~~
+
+and add the following code:
 
 ~~~js
 FlowRouter.route("/about",
@@ -156,11 +158,11 @@ The last transition example in the [Getting Started](#getting-started) section s
 
 A transition object has three parts, each of which hold "key, value" objects:
 
-The `hooks` will be applied before the transition animation starts, via a $.Velocity.hook() call
+The `hooks` will be applied BEFORE the transition animation starts, via a $.Velocity.hook() call
 ```
 hooks: {translateY: '-100%'},
 ```
-The `properties` object holds a string name, or the properties that will be animated. These are VelocityJS animation properties
+The `properties` object holds either a string name or animation properties. These are VelocityJS animation properties
 ```
 properties: {translateY: [0, '-100%']},  // move to translateY = 0, from translateY = -100%
 ```
