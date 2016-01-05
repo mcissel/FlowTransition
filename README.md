@@ -12,6 +12,7 @@ A Blaze layout renderer that uses VelocityJS powered transitions. It currently w
 ## Demo
 
 [flowtransition.meteor.com/](http://flowtransition.meteor.com/)
+
 [https://github.com/mcissel/flowtransition-demo](https://github.com/mcissel/flowtransition-demo)
 
 ## Getting Started
