@@ -26,7 +26,7 @@ You will need a few templates and a couple routes, before you can add a transiti
 </body>
 
 <template name="header">
-  <h1><a href="/">link to the Welcome page</a></h1>
+  <div><a href="/">link to the Welcome page</a></div>
 </template>
 
 <template name="welcome">
@@ -35,6 +35,8 @@ You will need a few templates and a couple routes, before you can add a transiti
 
 <template name="articles">
   <h2>Articles page</h2>
+  <span>Inline elements don't animate</span>
+  <div><span>This will animate, because it's wrapped in a block level element</span></div>
 </template>
 ~~~
 
