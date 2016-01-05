@@ -11,8 +11,9 @@ A Blaze layout renderer that uses VelocityJS powered transitions. It currently w
 
 ## Getting Started
 
-Add the package to your project with:
+Add this package and kadira:flow-router (if you haven't already):
 ~~~
+meteor add kadira:flow-router
 meteor add mcissel:flow-transition
 ~~~
 
@@ -39,19 +40,21 @@ You will need a few templates and a couple routes, before you can add a transiti
 
 And set up these routes. **Route names are required**, because that is how the transitions are assigned
 ~~~js
-FlowRouter.route("/",
-  name: "home", // required
-  action: function() {
-    FlowTransition.flow({body: "welcome"});
-  }
-);
+if (Meteor.isClient) {
+  FlowRouter.route("/", {
+    name: "home", // required
+    action: function() {
+      FlowTransition.flow({body: "welcome"});
+    }
+  });
 
-FlowRouter.route("/articles",
-  name: "articles", // required
-  action: function() {
-    FlowTransition.flow({head: "header"}, {body: "articles"});
-  }
-);
+  FlowRouter.route("/articles", {
+    name: "articles", // required
+    action: function() {
+      FlowTransition.flow({head: "header"}, {body: "articles"});
+    }
+  });
+}
 ~~~
 
 Now you can set up these transitions by assigning the:
